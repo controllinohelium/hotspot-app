@@ -115,6 +115,7 @@ const ValidatorDetailsPenalties = ({ validator }: Props) => {
       </Text>
 
       <FlatList
+        showsVerticalScrollIndicator={false}
         style={style}
         data={penalties}
         renderItem={renderItem}

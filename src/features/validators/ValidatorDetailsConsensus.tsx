@@ -1,117 +1,99 @@
-import { Validator } from '@helium/http'
-import React, { memo, useMemo, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
+import { RewardsV2, Validator } from '@helium/http'
+import React, { memo, useMemo, useCallback, useEffect, useState } from 'react'
 import { FlatList } from 'react-native-gesture-handler'
+import { useDispatch, useSelector } from 'react-redux'
 import Box from '../../components/Box'
-import Text from '../../components/Text'
+import { RootState } from '../../store/rootReducer'
+import { fetchActivity } from '../../store/validators/validatorsSlice'
 import { useBorderRadii, useSpacing } from '../../theme/themeHooks'
+import animateTransition from '../../utils/animateTransition'
+import SkeletonActivityItem from '../wallet/root/ActivityCard/SkeletonActivityItem'
+import ValidatorDetailsConsensusItem, {
+  ConsensusItem,
+} from './ValidatorDetailsConsensusItem'
 
-type Reward = {
-  type: string
-  gateway: string
-  amount: number
-  account: string
-  block: number
-}
 type Props = { validator?: Validator }
 const ValidatorDetailsConsensus = ({ validator }: Props) => {
-  const { t } = useTranslation()
   const { lm } = useBorderRadii()
   const { m } = useSpacing()
+  const [data, setData] = useState<ConsensusItem[]>([])
+  const dispatch = useDispatch()
+  const transactions = useSelector(
+    (state: RootState) => state.validators.transactions,
+  )
 
-  const data = useMemo(() => {
-    return [
-      {
-        type: 'consensus',
-        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
-        amount: 242248062,
-        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
-        block: 1234,
-      },
-      {
-        type: 'consensus',
-        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
-        amount: 242248062,
-        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
-        block: 1234,
-      },
-      {
-        type: 'consensus',
-        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
-        amount: 242248062,
-        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
-        block: 1234,
-      },
-      {
-        type: 'consensus',
-        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
-        amount: 242248062,
-        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
-        block: 1234,
-      },
-      {
-        type: 'consensus',
-        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
-        amount: 242248062,
-        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
-        block: 1234,
-      },
-      {
-        type: 'consensus',
-        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
-        amount: 242248062,
-        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
-        block: 1234,
-      },
-    ]
-  }, [])
+  useEffect(() => {
+    if (!validator?.address) return
 
-  type RewardItem = { index: number; item: Reward }
+    dispatch(fetchActivity(validator.address))
+  }, [dispatch, validator])
+
+  const txns = useMemo(() => {
+    if (!validator?.address) return []
+    return transactions[validator.address]
+  }, [transactions, validator?.address])
+
+  useEffect(() => {
+    let nextData: ConsensusItem[] = []
+    if (txns) {
+      nextData = txns.flatMap((txn) => {
+        if (txn.type !== 'rewards_v2') return [] as ConsensusItem[]
+        const rewards = txn as RewardsV2
+        return rewards.rewards.flatMap((r) => {
+          if (r.type !== 'consensus') return [] as ConsensusItem[]
+          return [
+            {
+              ...r,
+              block: rewards.startEpoch,
+            } as ConsensusItem,
+          ] as ConsensusItem[]
+        })
+      })
+    }
+
+    animateTransition('ValidatorDetailsConsensus.ChangeData', {
+      enabledOnAndroid: false,
+    })
+    setData(nextData)
+  }, [txns])
+
+  type RewardItem = { index: number; item: ConsensusItem }
   const renderItem = useCallback(
     ({ index, item }: RewardItem) => {
       const isFirst = index === 0
-      const isLast =
-        validator?.penalties?.length && index === validator.penalties.length - 1
+      const isLast = index === data.length - 1
       return (
-        <Box
-          backgroundColor="grayPurpleLight"
-          marginBottom="xxxs"
-          flexDirection="row"
-          borderTopLeftRadius={isFirst ? 'm' : 'none'}
-          borderTopRightRadius={isFirst ? 'm' : 'none'}
-          borderBottomLeftRadius={isLast ? 'm' : 'none'}
-          borderBottomRightRadius={isLast ? 'm' : 'none'}
-          padding="m"
-          alignItems="center"
-        >
-          <Box flex={1}>
-            <Text color="purpleMediumText" variant="medium" fontSize={15}>
-              {t('validator_details.consensus_group')}
-            </Text>
-            <Text color="purpleMediumText" variant="regular" fontSize={13}>
-              {t('validator_details.block_elected', {
-                block: item.block,
-              })}
-            </Text>
-          </Box>
-          <Text variant="medium" color="grayDarkText" fontSize={15}>
-            HNT
-          </Text>
-        </Box>
+        <ValidatorDetailsConsensusItem
+          isFirst={isFirst}
+          isLast={isLast}
+          item={item}
+        />
       )
     },
-    [t, validator],
+    [data.length],
   )
 
   const keyExtractor = useCallback((item, index) => {
-    const { block } = item as Reward
+    const { block } = item as ConsensusItem
     return `${block}.${index}`
   }, [])
 
   const contentContainerStyle = useMemo(() => ({ paddingBottom: 32 }), [])
-  const style = useMemo(() => ({ borderRadius: lm, marginTop: m }), [lm, m])
+  const style = useMemo(() => ({ borderRadius: lm, marginTop: m, flex: 1 }), [
+    lm,
+    m,
+  ])
+
+  if (txns === undefined)
+    return (
+      <Box marginTop="m">
+        <SkeletonActivityItem isFirst isLast />
+      </Box>
+    )
+
   return (
     <FlatList
+      showsVerticalScrollIndicator={false}
       style={style}
       data={data}
       renderItem={renderItem}
