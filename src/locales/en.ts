@@ -814,6 +814,7 @@ export default {
     status_offline: 'Offline',
     current_block_height: 'Current Block Height: {{blockHeight}}',
     penalty: 'Penalty',
+    lifetime_consensus: 'Lifetime Consensus',
     performance: 'Performance Penalty',
     tenure: 'Tenure Penalty',
     block: 'Block {{height}}',
