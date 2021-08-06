@@ -803,6 +803,7 @@ export default {
     overview: 'Overview',
     penalties: 'Penalties',
     consensus_groups: 'Consensus Groups',
+    consensus_group: 'Consensus Group',
     in_consensus: ' In Consensus Group',
     time_range: 'Time Range',
     time_range_24_hours: '24H',
@@ -818,6 +819,7 @@ export default {
     performance: 'Performance Penalty',
     tenure: 'Tenure Penalty',
     block: 'Block {{height}}',
+    block_elected: 'Block Elected {{block}}',
   },
   hotspot_details: {
     checklist: 'Progress',

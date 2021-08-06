@@ -2,57 +2,81 @@ import { Validator } from '@helium/http'
 import React, { memo, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FlatList } from 'react-native-gesture-handler'
-import { useSelector } from 'react-redux'
 import Box from '../../components/Box'
 import Text from '../../components/Text'
-import { RootState } from '../../store/rootReducer'
-import { Colors } from '../../theme/theme'
-import { locale } from '../../utils/i18n'
+import { useBorderRadii, useSpacing } from '../../theme/themeHooks'
 
-export type ValidatorPenalty = {
-  type: 'performance' | 'tenure'
-  height: number
+type Reward = {
+  type: string
+  gateway: string
   amount: number
+  account: string
+  block: number
 }
 type Props = { validator?: Validator }
 const ValidatorDetailsConsensus = ({ validator }: Props) => {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
+  const { lm } = useBorderRadii()
+  const { m } = useSpacing()
 
-  const blockHeight = useSelector(
-    (state: RootState) => state.heliumData.blockHeight,
-  )
+  const data = useMemo(() => {
+    return [
+      {
+        type: 'consensus',
+        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
+        amount: 242248062,
+        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
+        block: 1234,
+      },
+      {
+        type: 'consensus',
+        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
+        amount: 242248062,
+        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
+        block: 1234,
+      },
+      {
+        type: 'consensus',
+        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
+        amount: 242248062,
+        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
+        block: 1234,
+      },
+      {
+        type: 'consensus',
+        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
+        amount: 242248062,
+        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
+        block: 1234,
+      },
+      {
+        type: 'consensus',
+        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
+        amount: 242248062,
+        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
+        block: 1234,
+      },
+      {
+        type: 'consensus',
+        gateway: '112cHyRCaMcCSTpG7HP4hKHtmHDXGY9d7PYbD1SHKUtYC9h1L7Lt',
+        amount: 242248062,
+        account: '13SrU9gEwghUrwgvpQfihLz3uzAQBXsccvpUhH5vf3P2mAQdENB',
+        block: 1234,
+      },
+    ]
+  }, [])
 
-  const penalties = useMemo(() => {
-    if (!validator?.penalties) return [] as ValidatorPenalty[]
-    return validator.penalties.sort((l, r) => r.height - l.height)
-  }, [validator?.penalties])
-
-  type PenaltyItem = { index: number; item: ValidatorPenalty }
+  type RewardItem = { index: number; item: Reward }
   const renderItem = useCallback(
-    ({ index, item }: PenaltyItem) => {
-      let title = t('validator_details.penalty')
-      const key = `validator_details.${item.type}`
-      if (i18n.exists(key)) {
-        title = t(key)
-      }
+    ({ index, item }: RewardItem) => {
       const isFirst = index === 0
       const isLast =
         validator?.penalties?.length && index === validator.penalties.length - 1
-      const backgroundColor = () => {
-        switch (item.type) {
-          case 'tenure':
-            return 'redLight' as Colors
-          case 'performance':
-            return 'redMain' as Colors
-          default:
-            return 'black' as Colors
-        }
-      }
       return (
         <Box
-          flexDirection="row"
           backgroundColor="grayPurpleLight"
           marginBottom="xxxs"
+          flexDirection="row"
           borderTopLeftRadius={isFirst ? 'm' : 'none'}
           borderTopRightRadius={isFirst ? 'm' : 'none'}
           borderBottomLeftRadius={isLast ? 'm' : 'none'}
@@ -61,63 +85,39 @@ const ValidatorDetailsConsensus = ({ validator }: Props) => {
           alignItems="center"
         >
           <Box flex={1}>
-            <Box flexDirection="row" alignItems="center">
-              <Box
-                borderRadius="round"
-                height={11}
-                width={11}
-                backgroundColor={backgroundColor()}
-                marginRight="xs"
-              />
-              <Text color="purpleMediumText" variant="medium" fontSize={15}>
-                {title}
-              </Text>
-            </Box>
-
+            <Text color="purpleMediumText" variant="medium" fontSize={15}>
+              {t('validator_details.consensus_group')}
+            </Text>
             <Text color="purpleMediumText" variant="regular" fontSize={13}>
-              {t('validator_details.block', {
-                height: item.height.toLocaleString(locale),
+              {t('validator_details.block_elected', {
+                block: item.block,
               })}
             </Text>
           </Box>
           <Text variant="medium" color="grayDarkText" fontSize={15}>
-            {item.amount.toLocaleString(locale, {
-              maximumFractionDigits: 2,
-              minimumFractionDigits: 1,
-            })}
+            HNT
           </Text>
         </Box>
       )
     },
-    [i18n, t, validator],
+    [t, validator],
   )
 
-  const keyExtractor = useCallback((item) => {
-    const { height, type } = item as ValidatorPenalty
-    return `${height}.${type}`
+  const keyExtractor = useCallback((item, index) => {
+    const { block } = item as Reward
+    return `${block}.${index}`
   }, [])
 
   const contentContainerStyle = useMemo(() => ({ paddingBottom: 32 }), [])
-
+  const style = useMemo(() => ({ borderRadius: lm, marginTop: m }), [lm, m])
   return (
-    <Box flex={1}>
-      <Text
-        variant="medium"
-        fontSize={15}
-        color="grayLightText"
-        marginLeft="s"
-        marginVertical="ms"
-      >
-        {t('validator_details.current_block_height', { blockHeight })}
-      </Text>
-
-      <FlatList
-        data={penalties}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        contentContainerStyle={contentContainerStyle}
-      />
-    </Box>
+    <FlatList
+      style={style}
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      contentContainerStyle={contentContainerStyle}
+    />
   )
 }
 
