@@ -7,7 +7,6 @@ import accountSlice, {
 } from '../store/account/accountSlice'
 import { RootState } from '../store/rootReducer'
 import { useAppDispatch } from '../store/store'
-import useMount from './useMount'
 
 const settingsToTransfer = [
   'isFleetModeEnabled',
@@ -25,15 +24,20 @@ export default () => {
   const accountSettings = useSelector(
     (state: RootState) => state.account.settings,
   )
+  const accountBackedUp = useSelector(
+    (state: RootState) => state.app.isBackedUp,
+  )
 
   const refreshAccountSettings = useCallback(
     () => dispatch(fetchAccountSettings()),
     [dispatch],
   )
 
-  useMount(() => {
+  useEffect(() => {
+    if (!accountBackedUp) return
+
     refreshAccountSettings()
-  })
+  }, [accountBackedUp, refreshAccountSettings])
 
   useAppState({
     onForeground: () => refreshAccountSettings(),

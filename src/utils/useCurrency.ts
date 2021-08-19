@@ -22,7 +22,6 @@ const useCurrency = () => {
 
   const convert = useSelector(
     (state: RootState) => state.account.settings.convertHntToCurrency,
-    isEqual,
   )
 
   const toggle = useCallback(

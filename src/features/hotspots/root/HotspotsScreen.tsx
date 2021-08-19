@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { useSelector } from 'react-redux'
 import { ActivityIndicator } from 'react-native'
@@ -119,4 +119,4 @@ const HotspotsScreen = () => {
   )
 }
 
-export default HotspotsScreen
+export default memo(HotspotsScreen)

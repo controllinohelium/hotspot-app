@@ -25,7 +25,6 @@ import accountSlice, {
   updateSetting,
 } from '../../../store/account/accountSlice'
 import connectedHotspotSlice from '../../../store/connectedHotspot/connectedHotspotSlice'
-import heliumDataSlice from '../../../store/helium/heliumDataSlice'
 import Security from '../../../assets/images/security.svg'
 import Learn from '../../../assets/images/learn.svg'
 import Account from '../../../assets/images/account.svg'
@@ -182,7 +181,6 @@ const MoreScreen = () => {
             dispatch(activitySlice.actions.signOut())
             dispatch(hotspotsSlice.actions.signOut())
             dispatch(connectedHotspotSlice.actions.signOut())
-            dispatch(heliumDataSlice.actions.signOut())
           },
         },
       ],
