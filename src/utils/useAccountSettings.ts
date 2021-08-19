@@ -3,7 +3,7 @@ import useAppState from 'react-native-appstate-hook'
 import { useSelector } from 'react-redux'
 import accountSlice, {
   fetchAccountSettings,
-  syncAccountSettings,
+  transferAppSettingsToAccount,
 } from '../store/account/accountSlice'
 import { RootState } from '../store/rootReducer'
 import { useAppDispatch } from '../store/store'
@@ -58,6 +58,6 @@ export default () => {
   useEffect(() => {
     if (!transferRequired) return
 
-    dispatch(syncAccountSettings())
+    dispatch(transferAppSettingsToAccount())
   }, [dispatch, transferRequired])
 }

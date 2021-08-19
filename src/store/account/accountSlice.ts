@@ -69,8 +69,8 @@ export const fetchAccountSettings = createAsyncThunk<SettingsBag>(
   async () => getWallet('accounts/settings'),
 )
 
-export const syncAccountSettings = createAsyncThunk<SettingsBag>(
-  'account/syncAccountSettings',
+export const transferAppSettingsToAccount = createAsyncThunk<SettingsBag>(
+  'account/transferAppSettingsToAccount ',
   async () => {
     const fleetEnabled = await getSecureItem('fleetModeEnabled')
     const fleetAutoEnabled = await getSecureItem('hasFleetModeAutoEnabled')
@@ -237,15 +237,18 @@ const accountSlice = createSlice({
       const nextState = { ...state, settings, settingsLoaded: true }
       return nextState
     })
-    builder.addCase(syncAccountSettings.fulfilled, (state, { payload }) => {
-      const settings = settingsBagToKeyValue(payload)
-      return {
-        ...state,
-        settings,
-        settingsLoaded: true,
-        settingsTransferRequired: false,
-      }
-    })
+    builder.addCase(
+      transferAppSettingsToAccount.fulfilled,
+      (state, { payload }) => {
+        const settings = settingsBagToKeyValue(payload)
+        return {
+          ...state,
+          settings,
+          settingsLoaded: true,
+          settingsTransferRequired: false,
+        }
+      },
+    )
     builder.addCase(
       updateFleetModeEnabled.pending,
       (
